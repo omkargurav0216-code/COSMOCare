@@ -1,0 +1,471 @@
+
+import { mockAstronauts } from "../data/mockAstronauts";
+
+import {
+  ShieldAlert,
+  HeartPulse,
+  Moon,
+  Radiation,
+  Activity,
+  AlertTriangle,
+  CheckCircle2,
+  Info,
+  Satellite,
+  TrendingUp,
+  ClipboardList,
+} from "lucide-react";
+
+// Illustrative prototype risk outputs.
+// These values will eventually come from the ML backend.
+const riskData = {
+  overallScore: 38,
+  category: "Moderate",
+
+  indicators: [
+    {
+      name: "Cardiovascular Risk",
+      score: 25,
+      category: "Low",
+      description: "Heart rate and blood oxygen indicators",
+      icon: HeartPulse,
+      color: "#22d3ee",
+    },
+    {
+      name: "Fatigue Risk",
+      score: 62,
+      category: "Moderate",
+      description: "Sleep duration and fatigue indicators",
+      icon: Moon,
+      color: "#fbbf24",
+    },
+    {
+      name: "Radiation Risk",
+      score: 28,
+      category: "Low",
+      description: "Illustrative radiation exposure indicator",
+      icon: Radiation,
+      color: "#34d399",
+    },
+  ],
+};
+
+const recommendations = [
+  {
+    title: "Monitor sleep patterns",
+    description:
+      "Review sleep duration and recovery trends over the next monitoring period.",
+  },
+  {
+    title: "Review cardiovascular telemetry",
+    description:
+      "Compare heart rate readings against individual baseline measurements.",
+  },
+  {
+    title: "Continue routine monitoring",
+    description:
+      "Observe changes in fatigue and other health indicators.",
+  },
+];
+
+const categoryStyles = {
+  Low: "bg-emerald-400/10 text-emerald-400 border-emerald-400/20",
+  Moderate: "bg-amber-400/10 text-amber-400 border-amber-400/20",
+  High: "bg-red-400/10 text-red-400 border-red-400/20",
+};
+
+function RiskAssessment() {
+  const astronaut = mockAstronauts.find(
+    (item) => item.id === "AST-002"
+  );
+
+  const { overallScore, category, indicators } = riskData;
+
+  if (!astronaut) {
+    return (
+      <div className="astra-panel p-8 text-center">
+        <Info size={30} className="mx-auto text-amber-400" />
+
+        <h2 className="mt-3 text-lg font-semibold text-white">
+          Astronaut Not Found
+        </h2>
+
+        <p className="mt-2 text-sm text-slate-400">
+          The selected astronaut is not available in the current mock data.
+        </p>
+      </div>
+    );
+  }
+
+  const contributingFactors = [
+    {
+      factor: "Reduced sleep duration",
+      metric: `${astronaut.sleep} hours`,
+      impact: "High",
+      description:
+        "Sleep duration is below the illustrative mission target.",
+    },
+    {
+      factor: "Elevated heart rate",
+      metric: `${astronaut.heartRate} BPM`,
+      impact: "Moderate",
+      description:
+        "Heart rate is above the astronaut's illustrative baseline.",
+    },
+    {
+      factor: "Blood oxygen",
+      metric: `${astronaut.spo2}%`,
+      impact: "Low",
+      description:
+        "Continue monitoring oxygen saturation trends.",
+    },
+  ];
+
+  return (
+    <div className="space-y-7">
+
+      {/* Page heading */}
+      <section>
+        <div className="flex items-center gap-2 text-xs font-semibold tracking-[0.18em] text-cyan-400">
+          <ShieldAlert size={15} />
+          PREDICTIVE ANALYTICS
+        </div>
+
+        <h1 className="mt-2 text-3xl font-bold tracking-tight text-white">
+          Risk Assessment
+        </h1>
+
+        <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-400">
+          Explore astronaut health risk indicators, contributing
+          factors and explainable prototype assessment outputs.
+        </p>
+      </section>
+
+      {/* Selected astronaut */}
+      <section className="astra-panel flex flex-col justify-between gap-4 p-5 sm:flex-row sm:items-center">
+        <div className="flex items-center gap-4">
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-cyan-400/10 text-cyan-400">
+            <Satellite size={23} />
+          </div>
+
+          <div>
+            <p className="text-xs font-medium tracking-wider text-slate-500">
+              SELECTED ASTRONAUT
+            </p>
+
+            <h2 className="mt-1 font-semibold text-white">
+              {astronaut.name}
+            </h2>
+
+            <p className="mt-1 text-xs text-slate-400">
+              {astronaut.id} · {astronaut.mission || "ASTRA-01"}
+            </p>
+          </div>
+        </div>
+
+        <span className="w-fit rounded-full border border-amber-400/20 bg-amber-400/10 px-4 py-2 text-xs font-medium text-amber-400">
+          Prototype Assessment
+        </span>
+      </section>
+
+      {/* Overall risk assessment */}
+      <section className="grid grid-cols-1 gap-5 lg:grid-cols-3">
+
+        <div className="astra-panel p-6 lg:col-span-2">
+          <div className="flex items-center gap-2">
+            <ShieldAlert size={21} className="text-cyan-400" />
+
+            <h2 className="text-lg font-semibold text-white">
+              Overall Risk Indicator
+            </h2>
+          </div>
+
+          <div className="mt-8 flex flex-col items-center gap-7 sm:flex-row sm:justify-start sm:gap-12">
+
+            {/* Circular risk visualization */}
+            <div
+              className="relative flex h-44 w-44 shrink-0 items-center justify-center rounded-full"
+              style={{
+                background: `conic-gradient(#fbbf24 ${overallScore * 3.6}deg, #1e293b 0deg)`,
+              }}
+            >
+              <div className="absolute inset-[11px] flex flex-col items-center justify-center rounded-full bg-[#0d1729]">
+                <span className="text-5xl font-bold text-white">
+                  {overallScore}
+                </span>
+
+                <span className="mt-1 text-xs text-slate-500">
+                  OUT OF 100
+                </span>
+              </div>
+            </div>
+
+            <div className="max-w-sm text-center sm:text-left">
+              <span
+                className={`inline-flex rounded-full border px-4 py-2 text-sm font-semibold ${
+                  categoryStyles[category] || categoryStyles.Moderate
+                }`}
+              >
+                {category} Risk
+              </span>
+
+              <p className="mt-5 text-sm leading-7 text-slate-400">
+                The illustrative prototype indicates a moderate
+                risk level, with fatigue being the most prominent
+                contributing indicator.
+              </p>
+
+              <p className="mt-4 text-xs text-slate-500">
+                Illustrative prototype score · Not a validated prediction
+              </p>
+            </div>
+          </div>
+
+          {/* Risk scale */}
+          <div className="mt-9">
+            <div className="mb-3 flex justify-between text-xs text-slate-500">
+              <span>Low</span>
+              <span>Moderate</span>
+              <span>High</span>
+            </div>
+
+            <div className="flex h-2 overflow-hidden rounded-full">
+              <div className="w-1/3 bg-emerald-400" />
+              <div className="w-1/3 bg-amber-400" />
+              <div className="w-1/3 bg-red-400" />
+            </div>
+
+            <div className="mt-2 flex justify-between text-xs text-slate-500">
+              <span>0</span>
+              <span>33</span>
+              <span>66</span>
+              <span>100</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Assessment summary */}
+        <div className="astra-panel p-5">
+          <div className="flex items-center gap-2">
+            <ClipboardList size={19} className="text-cyan-400" />
+
+            <h2 className="font-semibold text-white">
+              Assessment Summary
+            </h2>
+          </div>
+
+          <div className="mt-6 space-y-5">
+            <Summary label="Astronaut" value={astronaut.name} />
+            <Summary label="Crew ID" value={astronaut.id} />
+            <Summary
+              label="Mission"
+              value={astronaut.mission || "ASTRA-01"}
+            />
+            <Summary label="Primary Factor" value="Fatigue" />
+            <Summary label="Assessment Type" value="Prototype" />
+          </div>
+        </div>
+      </section>
+
+      {/* Individual risk indicators */}
+      <section>
+        <div className="flex items-center gap-2">
+          <TrendingUp size={19} className="text-cyan-400" />
+
+          <h2 className="text-lg font-semibold text-white">
+            Risk Indicators
+          </h2>
+        </div>
+
+        <p className="mt-2 text-sm text-slate-500">
+          Individual health-related indicator scores
+        </p>
+
+        <div className="mt-5 grid grid-cols-1 gap-4 lg:grid-cols-3">
+          {indicators.map((indicator) => {
+            const Icon = indicator.icon;
+
+            return (
+              <div
+                key={indicator.name}
+                className="astra-panel astra-panel-hover p-5"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="rounded-lg bg-white/5 p-2">
+                    <Icon
+                      size={21}
+                      style={{ color: indicator.color }}
+                    />
+                  </div>
+
+                  <span
+                    className={`rounded-full border px-3 py-1 text-xs ${
+                      categoryStyles[indicator.category] ||
+                      categoryStyles.Low
+                    }`}
+                  >
+                    {indicator.category}
+                  </span>
+                </div>
+
+                <h3 className="mt-5 font-semibold text-white">
+                  {indicator.name}
+                </h3>
+
+                <p className="mt-2 min-h-9 text-xs leading-5 text-slate-500">
+                  {indicator.description}
+                </p>
+
+                <div className="mt-5 flex items-end justify-between">
+                  <p className="text-3xl font-bold text-white">
+                    {indicator.score}
+                    <span className="ml-1 text-sm font-normal text-slate-500">
+                      / 100
+                    </span>
+                  </p>
+                </div>
+
+                <div className="mt-4 h-2 overflow-hidden rounded-full bg-slate-800">
+                  <div
+                    className="h-full rounded-full transition-all"
+                    style={{
+                      width: `${indicator.score}%`,
+                      backgroundColor: indicator.color,
+                    }}
+                  />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* Contributing factors */}
+      <section className="astra-panel p-5 sm:p-6">
+        <div className="flex items-center gap-2">
+          <Activity size={21} className="text-cyan-400" />
+
+          <h2 className="text-lg font-semibold text-white">
+            Contributing Factors
+          </h2>
+        </div>
+
+        <p className="mt-2 text-sm text-slate-500">
+          Illustrative health indicators associated with the prototype assessment
+        </p>
+
+        <div className="mt-5 space-y-3">
+          {contributingFactors.map((factor) => (
+            <div
+              key={factor.factor}
+              className="rounded-xl border border-slate-800 bg-[#111f35]/70 p-4"
+            >
+              <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+                <div>
+                  <h3 className="text-sm font-medium text-white">
+                    {factor.factor}
+                  </h3>
+
+                  <p className="mt-1 text-xs leading-5 text-slate-500">
+                    {factor.description}
+                  </p>
+                </div>
+
+                <div className="flex items-center justify-between gap-4 sm:justify-end">
+                  <span className="text-sm font-medium text-slate-300">
+                    {factor.metric}
+                  </span>
+
+                  <span
+                    className={`rounded-full border px-3 py-1 text-xs ${
+                      categoryStyles[factor.impact] ||
+                      categoryStyles.Low
+                    }`}
+                  >
+                    {factor.impact}
+                  </span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Suggested monitoring actions */}
+      <section className="astra-panel p-5 sm:p-6">
+        <div className="flex items-center gap-2">
+          <CheckCircle2 size={21} className="text-emerald-400" />
+
+          <h2 className="text-lg font-semibold text-white">
+            Suggested Monitoring Actions
+          </h2>
+        </div>
+
+        <p className="mt-2 text-sm text-slate-500">
+          Illustrative monitoring considerations for the prototype
+        </p>
+
+        <div className="mt-6 space-y-5">
+          {recommendations.map((item, index) => (
+            <div key={item.title} className="flex gap-4">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-cyan-400/10 text-sm font-semibold text-cyan-400">
+                {String(index + 1).padStart(2, "0")}
+              </div>
+
+              <div>
+                <h3 className="text-sm font-medium text-white">
+                  {item.title}
+                </h3>
+
+                <p className="mt-2 text-sm leading-6 text-slate-400">
+                  {item.description}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Prototype disclaimer */}
+      <section className="rounded-xl border border-amber-400/20 bg-amber-400/5 p-4">
+        <div className="flex items-start gap-3">
+          <AlertTriangle
+            size={20}
+            className="mt-0.5 shrink-0 text-amber-400"
+          />
+
+          <div>
+            <h3 className="text-sm font-semibold text-amber-400">
+              Prototype Risk Assessment Disclaimer
+            </h3>
+
+            <p className="mt-2 text-xs leading-6 text-slate-400">
+              All risk scores, categories, contributing factors and
+              recommendations displayed here are illustrative mock data.
+              They do not represent validated machine learning predictions,
+              medical diagnoses or clinical recommendations. Actual risk
+              assessment logic will be integrated with the ML backend after
+              agreement on the API contract and model outputs.
+            </p>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  );
+}
+
+function Summary({ label, value }) {
+  return (
+    <div className="flex items-center justify-between gap-3 border-b border-slate-800 pb-3">
+      <span className="text-xs text-slate-500">
+        {label}
+      </span>
+
+      <span className="text-right text-sm font-medium text-slate-200">
+        {value}
+      </span>
+    </div>
+  );
+}
+
+export default RiskAssessment;
