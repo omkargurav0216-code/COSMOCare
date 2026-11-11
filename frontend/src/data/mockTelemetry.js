@@ -1,0 +1,115 @@
+
+export const mockTelemetry = {
+  "24h": [
+    {
+      time: "00:00",
+      heartRate: 68,
+      spo2: 98,
+      sleep: 0.8,
+      temperature: 36.6,
+      radiation: 0.03,
+    },
+    {
+      time: "04:00",
+      heartRate: 65,
+      spo2: 99,
+      sleep: 1.2,
+      temperature: 36.5,
+      radiation: 0.04,
+    },
+    {
+      time: "08:00",
+      heartRate: 72,
+      spo2: 98,
+      sleep: 0.2,
+      temperature: 36.8,
+      radiation: 0.02,
+    },
+    {
+      time: "12:00",
+      heartRate: 78,
+      spo2: 97,
+      sleep: 0,
+      temperature: 37.0,
+      radiation: 0.05,
+    },
+    {
+      time: "16:00",
+      heartRate: 74,
+      spo2: 98,
+      sleep: 0,
+      temperature: 36.9,
+      radiation: 0.03,
+    },
+    {
+      time: "20:00",
+      heartRate: 70,
+      spo2: 98,
+      sleep: 0.5,
+      temperature: 36.7,
+      radiation: 0.04,
+    },
+  ],
+
+  "7d": [
+    {
+      time: "Mon",
+      heartRate: 70,
+      spo2: 98,
+      sleep: 7.5,
+      temperature: 36.7,
+      radiation: 0.32,
+    },
+    {
+      time: "Tue",
+      heartRate: 72,
+      spo2: 97,
+      sleep: 6.8,
+      temperature: 36.8,
+      radiation: 0.35,
+    },
+    {
+      time: "Wed",
+      heartRate: 75,
+      spo2: 98,
+      sleep: 7.2,
+      temperature: 36.9,
+      radiation: 0.38,
+    },
+    {
+      time: "Thu",
+      heartRate: 73,
+      spo2: 99,
+      sleep: 8.0,
+      temperature: 36.6,
+      radiation: 0.34,
+    },
+    {
+      time: "Fri",
+      heartRate: 78,
+      spo2: 97,
+      sleep: 6.2,
+      temperature: 37.0,
+      radiation: 0.41,
+    },
+    {
+      time: "Sat",
+      heartRate: 72,
+      spo2: 98,
+      sleep: 7.5,
+      temperature: 36.8,
+      radiation: 0.39,
+    },
+    {
+      time: "Sun",
+      heartRate: 70,
+      spo2: 98,
+      sleep: 7.8,
+      temperature: 36.7,
+      radiation: 0.42,
+    },
+  ],
+};
+
+// All telemetry readings are illustrative prototype data.
+// Replace with backend telemetry later.
