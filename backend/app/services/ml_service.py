@@ -29,7 +29,7 @@ def _load():
         (Path(__file__).resolve().parents[2] / settings.ML_SRC_PATH),
         (Path(__file__).resolve().parents[3] / "ml" / "src"),
         (Path(__file__).resolve().parents[2] / "ml" / "src"),
-        Path(r"C:\Users\MAYUR\OneDrive\Desktop\Astronaut Health Monitoring and Risk Assessment System\COSMOCare-ml-model\ml\src"),
+        (Path(__file__).resolve().parents[3] / "COSMOCare-ml-model" / "ml" / "src"),
     ]
     resolved_path = None
     for candidate in candidate_paths:
