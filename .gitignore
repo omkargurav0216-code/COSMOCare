@@ -240,5 +240,3 @@ lightning_logs/
 .DS_Store
 Thumbs.db
 desktop.ini
-
-ml/venv312/
