@@ -27,55 +27,82 @@ import {
 
 const metricOptions = [
   {
-    key: "heartRate",
+    key: "heart_rate_bpm",
     label: "Heart Rate",
     unit: "BPM",
     color: "#fb7185",
     icon: HeartPulse,
   },
   {
-    key: "spo2",
+    key: "spo2_percent",
     label: "Blood Oxygen",
     unit: "%",
     color: "#22d3ee",
     icon: Activity,
   },
   {
-    key: "sleep",
+    key: "sleep_chart_hours",
     label: "Sleep Duration",
     unit: "hrs",
     color: "#a78bfa",
     icon: Moon,
   },
   {
-    key: "temperature",
+    key: "body_temperature_celsius",
     label: "Temperature",
     unit: "°C",
     color: "#fbbf24",
     icon: Thermometer,
   },
   {
-    key: "radiation",
-    label: "Radiation Exposure",
-    unit: "mSv",
+    key: "radiation_dose_rate_usv_per_hour",
+    label: "Radiation Dose Rate",
+    unit: "μSv/hour",
     color: "#fb923c",
     icon: Radiation,
   },
 ];
 
+const formatTimestamp = (timestamp, range) => {
+  const date = new Date(timestamp);
+
+  if (Number.isNaN(date.getTime())) {
+    return "Unknown";
+  }
+
+  if (range === "24h") {
+    return date.toLocaleTimeString("en-GB", {
+      hour: "2-digit",
+      minute: "2-digit",
+      timeZone: "UTC",
+    });
+  }
+
+  return date.toLocaleDateString("en-GB", {
+    weekday: "short",
+    timeZone: "UTC",
+  });
+};
+
 function HealthMonitoring() {
   const [timeRange, setTimeRange] = useState("24h");
-  const [selectedMetric, setSelectedMetric] = useState("heartRate");
+  const [selectedMetric, setSelectedMetric] =
+    useState("heart_rate_bpm");
 
   const astronaut = mockAstronauts.find(
-    (item) => item.id === "AST-001"
+    (item) => item.astronaut_id === "AST-001"
   );
 
   const currentMetric = metricOptions.find(
     (metric) => metric.key === selectedMetric
   );
 
-  const chartData = mockTelemetry[timeRange] || [];
+  const chartData = (mockTelemetry[timeRange] || []).map(
+    (reading) => ({
+      ...reading,
+      display_time: formatTimestamp(reading.timestamp, timeRange),
+    })
+  );
 
   if (!astronaut || !currentMetric) {
     return (
@@ -90,13 +117,40 @@ function HealthMonitoring() {
     );
   }
 
-  const summaryMetrics = metricOptions.map((metric) => ({
-    ...metric,
-    value: astronaut[metric.key] ?? "N/A",
-  }));
+  const summaryMetrics = [
+    {
+      ...metricOptions[0],
+      value: astronaut.heart_rate_bpm,
+    },
+    {
+      ...metricOptions[1],
+      value: astronaut.spo2_percent,
+    },
+    {
+      ...metricOptions[2],
+      value: astronaut.sleep_hours_last_24h,
+    },
+    {
+      ...metricOptions[3],
+      value: astronaut.body_temperature_celsius,
+    },
+    {
+      ...metricOptions[4],
+      value: astronaut.radiation_dose_rate_usv_per_hour,
+    },
+  ];
 
-  // Illustrative prototype value. Not an ML-generated score.
-  const fatigueScore = 25;
+  const selectedMetricHasData = chartData.some(
+    (reading) =>
+      typeof reading[selectedMetric] === "number" &&
+      Number.isFinite(reading[selectedMetric])
+  );
+
+  const fatigueValue = astronaut.fatigue_level_0_10;
+
+  const fatigueAvailable =
+    typeof fatigueValue === "number" &&
+    Number.isFinite(fatigueValue);
 
   return (
     <div className="space-y-7">
@@ -135,7 +189,7 @@ function HealthMonitoring() {
             </h2>
 
             <p className="mt-1 text-xs text-slate-400">
-              {astronaut.id} · {astronaut.role}
+              {astronaut.astronaut_id} · {astronaut.role}
             </p>
           </div>
         </div>
@@ -166,6 +220,9 @@ function HealthMonitoring() {
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {summaryMetrics.map((metric) => {
             const Icon = metric.icon;
+            const available =
+              typeof metric.value === "number" &&
+              Number.isFinite(metric.value);
 
             return (
               <div
@@ -178,18 +235,27 @@ function HealthMonitoring() {
                   </p>
 
                   <div className="rounded-lg bg-white/5 p-2">
-                    <Icon size={19} style={{ color: metric.color }} />
+                    <Icon
+                      size={19}
+                      style={{ color: metric.color }}
+                    />
                   </div>
                 </div>
 
-                <div className="mt-5 flex items-baseline gap-2">
-                  <span className="text-3xl font-bold tracking-tight text-white">
-                    {metric.value}
+                <div className="mt-5 flex flex-wrap items-baseline gap-2">
+                  <span className={`font-bold tracking-tight ${
+                    available
+                      ? "text-3xl text-white"
+                      : "text-base text-slate-500"
+                  }`}>
+                    {available ? metric.value : "Insufficient Data"}
                   </span>
 
-                  <span className="text-xs text-slate-500">
-                    {metric.unit}
-                  </span>
+                  {available && (
+                    <span className="text-xs text-slate-500">
+                      {metric.unit}
+                    </span>
+                  )}
                 </div>
 
                 <div
@@ -220,7 +286,7 @@ function HealthMonitoring() {
             </div>
 
             <p className="mt-2 text-sm text-slate-500">
-              Historical biometric data visualization
+              Illustrative biometric chart samples
             </p>
           </div>
 
@@ -285,7 +351,7 @@ function HealthMonitoring() {
 
         {/* Chart */}
         <div className="mt-6 h-72 w-full">
-          {chartData.length > 0 ? (
+          {selectedMetricHasData ? (
             <ResponsiveContainer width="100%" height="100%">
               <LineChart
                 data={chartData}
@@ -298,7 +364,7 @@ function HealthMonitoring() {
                 />
 
                 <XAxis
-                  dataKey="time"
+                  dataKey="display_time"
                   axisLine={false}
                   tickLine={false}
                   tick={{ fill: "#94a3b8", fontSize: 11 }}
@@ -338,12 +404,17 @@ function HealthMonitoring() {
                     stroke: "#0d1729",
                     strokeWidth: 2,
                   }}
+                  connectNulls={false}
                 />
               </LineChart>
             </ResponsiveContainer>
           ) : (
-            <div className="flex h-full items-center justify-center text-sm text-slate-500">
-              No illustrative telemetry available for this time range.
+            <div className="flex h-full flex-col items-center justify-center gap-2 text-center text-sm text-slate-500">
+              <ShieldCheck size={24} />
+              <p>Insufficient Data</p>
+              <p className="text-xs">
+                No validated illustrative samples are available for this metric.
+              </p>
             </div>
           )}
         </div>
@@ -351,8 +422,8 @@ function HealthMonitoring() {
         <div className="mt-4 flex items-center gap-2 border-t border-slate-800 pt-4 text-xs text-slate-500">
           <Clock3 size={14} />
           {timeRange === "24h"
-            ? "Illustrative readings across 24 hours"
-            : "Illustrative readings across 7 days"}
+            ? "Illustrative samples across 24 hours"
+            : "Illustrative samples across 7 days"}
         </div>
       </section>
 
@@ -367,42 +438,36 @@ function HealthMonitoring() {
         </div>
 
         <p className="mt-2 text-sm text-slate-500">
-          Illustrative fatigue indicator for the selected astronaut
+          Fatigue indicator from the astronaut telemetry profile
         </p>
 
-        <div className="mt-6 grid gap-6 sm:grid-cols-2 sm:items-center">
-          <div>
-            <p className="text-xs text-slate-500">
-              Prototype indicator
+        {fatigueAvailable ? (
+          <div className="mt-6">
+            <p className="text-3xl font-bold text-white">
+              {fatigueValue}/10
             </p>
-
-            <p className="mt-2 text-3xl font-bold text-emerald-400">
-              Low
+            <p className="mt-2 text-xs text-slate-500">
+              Numeric fatigue measurement (0–10 scale)
             </p>
-
-            <p className="mt-1 text-sm text-slate-400">
-              {fatigueScore}/100
-            </p>
-          </div>
-
-          <div>
-            <div className="mb-3 flex justify-between text-xs text-slate-500">
-              <span>0 - Low</span>
-              <span>100 - High</span>
-            </div>
-
-            <div className="h-3 overflow-hidden rounded-full bg-slate-800">
+            <div className="mt-4 h-3 overflow-hidden rounded-full bg-slate-800">
               <div
-                className="h-full rounded-full bg-emerald-400 transition-all"
-                style={{ width: `${fatigueScore}%` }}
+                className="h-full rounded-full bg-purple-400"
+                style={{
+                  width: `${Math.min(10, Math.max(0, fatigueValue)) * 10}%`,
+                }}
               />
             </div>
-
-            <p className="mt-3 text-right text-xs text-slate-500">
-              Illustrative score: {fatigueScore}/100
+          </div>
+        ) : (
+          <div className="mt-6 rounded-lg border border-slate-700/60 bg-slate-900/40 p-4">
+            <p className="font-semibold text-slate-300">
+              Insufficient Data
+            </p>
+            <p className="mt-1 text-sm text-slate-500">
+              A validated numeric fatigue measurement is not currently available.
             </p>
           </div>
-        </div>
+        )}
       </section>
 
       {/* Data notice */}
@@ -416,11 +481,13 @@ function HealthMonitoring() {
           <span className="font-semibold text-slate-300">
             Prototype data notice:
           </span>{" "}
-          All telemetry values, charts and fatigue indicators are
-          simulated illustrative data. They are not actual astronaut
-          measurements, validated medical assessments or clinical
-          predictions. Live telemetry integration is pending the
-          agreed backend API contract.
+          All telemetry values and charts are simulated illustrative
+          data. Sleep chart samples are not validated rolling 24-hour
+          sleep measurements. Radiation dose rate and numeric fatigue
+          values are currently unavailable. These values are not actual
+          astronaut measurements, validated medical assessments or
+          clinical predictions. Live telemetry integration is pending
+          the agreed backend API contract.
         </p>
       </div>
     </div>

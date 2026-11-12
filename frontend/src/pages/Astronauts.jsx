@@ -2,7 +2,6 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import {
-  UserRound,
   Activity,
   HeartPulse,
   ArrowUpRight,
@@ -18,7 +17,6 @@ import { mockAstronauts } from "../data/mockAstronauts";
 
 const astronauts = mockAstronauts.map((astronaut) => ({
   ...astronaut,
-  mission: "ASTRA-01",
   initials: astronaut.name
     .split(" ")
     .map((part) => part[0])
@@ -28,7 +26,7 @@ const astronauts = mockAstronauts.map((astronaut) => ({
     "AST-002": "bg-purple-500/10 text-purple-400 border-purple-400/20",
     "AST-003": "bg-emerald-500/10 text-emerald-400 border-emerald-400/20",
     "AST-004": "bg-amber-500/10 text-amber-400 border-amber-400/20",
-  }[astronaut.id] || "bg-slate-500/10 text-slate-400 border-slate-500/20",
+  }[astronaut.astronaut_id] || "bg-slate-500/10 text-slate-400 border-slate-500/20",
 }));
 
 const statusStyles = {
@@ -61,7 +59,7 @@ function Astronauts() {
     return astronauts.filter((astronaut) => {
       const matchesSearch =
         astronaut.name.toLowerCase().includes(query) ||
-        astronaut.id.toLowerCase().includes(query) ||
+        astronaut.astronaut_id.toLowerCase().includes(query) ||
         astronaut.role.toLowerCase().includes(query);
 
       const matchesStatus =
@@ -213,7 +211,7 @@ function Astronauts() {
           <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
             {filteredAstronauts.map((astronaut) => (
               <AstronautCard
-                key={astronaut.id}
+                key={astronaut.astronaut_id}
                 astronaut={astronaut}
               />
             ))}
@@ -280,6 +278,17 @@ function AstronautCard({ astronaut }) {
   const statusClass =
     statusStyles[astronaut.status] || statusStyles.Normal;
 
+  const fatigue = astronaut.fatigue_level_0_10;
+
+  const fatigueLabel =
+    fatigue === null || fatigue === undefined
+      ? "Insufficient Data"
+      : fatigue <= 3
+        ? "Low"
+        : fatigue <= 6
+          ? "Moderate"
+          : "High";
+
   return (
     <div className="astra-panel astra-panel-hover group p-5 md:p-6">
       {/* Identity */}
@@ -301,7 +310,7 @@ function AstronautCard({ astronaut }) {
             </p>
 
             <p className="mt-1 text-xs tracking-wide text-slate-500">
-              {astronaut.id}
+              {astronaut.astronaut_id}
             </p>
           </div>
         </div>
@@ -317,21 +326,29 @@ function AstronautCard({ astronaut }) {
       <div className="my-5 grid grid-cols-3 gap-3 border-y border-slate-800/80 py-5">
         <Metric
           label="Heart Rate"
-          value={`${astronaut.heartRate} bpm`}
+          value={
+            astronaut.heart_rate_bpm == null
+              ? "Insufficient Data"
+              : `${astronaut.heart_rate_bpm} bpm`
+          }
           icon={HeartPulse}
           color="text-rose-400"
         />
 
         <Metric
           label="SpO₂"
-          value={`${astronaut.spo2}%`}
+          value={
+            astronaut.spo2_percent == null
+              ? "Insufficient Data"
+              : `${astronaut.spo2_percent}%`
+          }
           icon={Wind}
           color="text-cyan-400"
         />
 
         <Metric
           label="Fatigue"
-          value={astronaut.fatigue}
+          value={fatigueLabel}
           icon={BatteryMedium}
           color="text-amber-400"
         />
@@ -349,7 +366,7 @@ function AstronautCard({ astronaut }) {
         </div>
 
         <Link
-          to={`/astronauts/${astronaut.id}`}
+          to={`/astronauts/${astronaut.astronaut_id}`}
           className="flex items-center gap-2 rounded-lg border border-cyan-400/20 bg-cyan-400/5 px-4 py-2.5 text-xs font-semibold text-cyan-400 transition hover:border-cyan-400/40 hover:bg-cyan-400/10"
         >
           View Profile
@@ -370,7 +387,7 @@ function Metric({ label, value, icon: Icon, color }) {
         </p>
       </div>
 
-      <p className="mt-2 truncate text-sm font-semibold text-slate-200">
+      <p className="mt-2 break-words text-sm font-semibold text-slate-200">
         {value}
       </p>
     </div>
