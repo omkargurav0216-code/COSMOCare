@@ -16,7 +16,6 @@ import pandas as pd
 
 # Reproducibility: running the script again produces the same dataset.
 RANDOM_SEED = 42
-rng = np.random.default_rng(RANDOM_SEED)
 
 # Dataset configuration
 NUM_ASTRONAUTS = 4
@@ -31,7 +30,10 @@ ASTRONAUT_IDS = [
 ]
 
 
-def generate_telemetry():
+def generate_telemetry(seed=RANDOM_SEED):
+    """Generate synthetic hourly telemetry for multiple astronauts."""
+
+    rng = np.random.default_rng(seed)
     """Generate synthetic hourly telemetry for multiple astronauts."""
 
     records = []
