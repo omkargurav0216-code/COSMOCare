@@ -1,7 +1,15 @@
 """Integration adapter. The ML developer owns the code at ML_SRC_PATH."""
 import sys
+import importlib
 from pathlib import Path
-from app.core.config import settings
+
+try:
+    from app.core.config import settings
+except (ImportError, ModuleNotFoundError):
+    _backend_root = str(Path(__file__).resolve().parents[2])
+    if _backend_root not in sys.path:
+        sys.path.insert(0, _backend_root)
+    from app.core.config import settings
 
 FIELDS = (
     "astronaut_id",
@@ -39,9 +47,16 @@ def _load():
         )
     if str(resolved_path) not in sys.path:
         sys.path.insert(0, str(resolved_path))
-    from baseline.baseline import calculate_baseline
-    from risk_assessment.risk_engine import calculate_risk
-    return calculate_baseline, calculate_risk
+
+    try:
+        baseline_module = importlib.import_module("baseline.baseline")
+        risk_engine_module = importlib.import_module("risk_assessment.risk_engine")
+        calc_baseline = getattr(baseline_module, "calculate_baseline")
+        calc_risk = getattr(risk_engine_module, "calculate_risk")
+    except (ImportError, AttributeError) as exc:
+        raise ImportError(f"Error loading ML functions from {resolved_path}: {exc}") from exc
+
+    return calc_baseline, calc_risk
 
 def calculate_baseline(history, min_history=24):
     calc_b, _ = _load()
