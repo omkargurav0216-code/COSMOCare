@@ -1,116 +1,69 @@
+# COSMOCare Backend
 
-# Backend – COSMOCare
+FastAPI + SQLAlchemy + SQLite backend for COSMOCare. Built as the `backend` branch deliverable and organized by phases in [docs/PHASES.md](docs/PHASES.md).
 
-The backend module serves as the central communication layer of COSMOCare. It manages API requests, processes health data, coordinates machine learning predictions, and connects the frontend with the AI assistant.
+## Requirements
+Python 3.12.10. The ML repository additionally requires its own packages; install the combined backend requirements below.
 
-## Technology Stack
-
-- Python    MENTION PYTHON VERSION
-- FastAPI
-- Uvicorn
-- Pydantic
-- SQLite / PostgreSQL
-- SQLAlchemy (if required)
-
-## Responsibilities
-
-- Develop REST API endpoints.
-- Receive and process astronaut health data.
-- Integrate machine learning predictions.
-- Retrieve risk assessment results.
-- Manage health alerts and records.
-- Connect frontend services with the AI assistant.
-- Handle database operations.
-
-## Suggested Structure
-
-```text
-backend/
-│
-├── app/
-│   ├── api/
-│   │   └── routes/
-│   ├── core/
-│   ├── models/
-│   ├── schemas/
-│   ├── services/
-│   ├── database/
-│   └── main.py
-│
-├── tests/
-├── requirements.txt
-├── .env.example
-└── README.md
-```
-
-## Setup Instructions
-
-### 1. Navigate to backend
-
-```bash
-cd backend
-```
-
-### 2. Create virtual environment
-
-```bash
-python -m venv venv
-```
-
-### 3. Activate environment
-
-Windows:
-```bash
-venv\Scripts\activate
-```
-
-Linux / macOS:
-```bash
-source venv/bin/activate
-```
-
-### 4. Install dependencies
-
-```bash
+## Setup (Windows PowerShell)
+```powershell
+cd COSMOCare-backend
+py -3.12 -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
 pip install -r requirements.txt
+Copy-Item .env.example .env
 ```
+Set `ML_SRC_PATH` in `.env` to the ML repo's `ml/src` directory. Example when backend and ML directories are siblings:
+`ML_SRC_PATH=../COSMOCare-ml-model/ml/src`
 
-### 5. Start FastAPI server
-
+## Run
 ```bash
 uvicorn app.main:app --reload
 ```
+- API docs: http://localhost:8000/docs
+- Health: http://localhost:8000/health
+- API base: http://localhost:8000/api/v1
 
-API documentation:
+SQLite file is created at `cosmocare.db`. Demo seed data is enabled by default; set `SEED_DATABASE=false` to disable it.
 
-- Swagger UI: http://localhost:8000/docs
+## Endpoints
+| Method | Path |
+|---|---|
+| GET | `/api/v1/astronauts` |
+| GET | `/api/v1/astronauts/{astronaut_id}` |
+| GET | `/api/v1/astronauts/{astronaut_id}/telemetry` |
+| POST | `/api/v1/telemetry` |
+| GET | `/api/v1/astronauts/{astronaut_id}/risk` |
+| POST | `/api/v1/astronauts/{astronaut_id}/risk/analyze` |
+| GET | `/api/v1/astronauts/{astronaut_id}/alerts` |
+| GET | `/api/v1/alerts` |
+| PATCH | `/api/v1/alerts/{alert_id}` |
+| POST | `/api/v1/simulation/run` |
+| POST | `/api/v1/chat` |
+| GET | `/health` |
 
-## API Responsibilities
-
-The backend is expected to provide endpoints for:
-
-- Health data retrieval.
-- Astronaut profile management.
-- Health risk assessment.
-- Anomaly detection.
-- Alert management.
-- AI chatbot communication.
-
-Exact endpoints and request/response schemas will be documented as implementation progresses.
-
-## Environment Variables
-
-Store sensitive configuration in `.env`.
-
-Example:
-
-```env
-DATABASE_URL=
-LLM_API_KEY=
+## Test
+```bash
+python -m pytest -q
 ```
 
-Never commit actual API keys or credentials.
+## Python version check
 
-## Module Status
+```powershell
+python --version
+# Expected: Python 3.12.10
+```
 
-Under Development.
+## Integration notes
+- Frontend base URL: `VITE_API_BASE_URL=http://localhost:8000/api/v1`.
+- CORS origins are comma-separated in `CORS_ORIGINS`.
+- ML implementation remains owned by the ML developer. This backend calls the published `ml/src` functions and does not duplicate them.
+- Chat endpoint is an integration contract only. AI provider integration is pending and owned by the AI developer.
+- Demo readings and risk thresholds are illustrative, not clinical guidance.
+- Do not commit `.env`, credentials, database files or real astronaut personal data.
+
+## Integration verification
+The ML adapter uses the external ML repository's `calculate_baseline` and `calculate_risk` functions. Extract the ML ZIP alongside this backend and set `ML_SRC_PATH` to its `ml/src` folder. Risk endpoints return HTTP 503 if that folder is missing.
+
+This package does not contain the AI provider implementation. Do not use prototype risk scores for clinical decisions.
