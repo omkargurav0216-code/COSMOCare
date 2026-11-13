@@ -9,7 +9,6 @@ import {
   Radiation,
   UserRound,
   ShieldCheck,
-  Satellite,
   Wind,
   Clock3,
   Gauge,
@@ -27,7 +26,9 @@ const statusStyles = {
 function AstronautDetails() {
   const { id } = useParams();
 
-  const astronaut = mockAstronauts.find((item) => item.id === id);
+  const astronaut = mockAstronauts.find(
+    (item) => item.astronaut_id === id
+  );
 
   if (!astronaut) {
     return (
@@ -64,7 +65,7 @@ function AstronautDetails() {
   const metrics = [
     {
       label: "Heart Rate",
-      value: astronaut.heartRate,
+      value: astronaut.heart_rate_bpm,
       unit: "bpm",
       icon: HeartPulse,
       color: "text-rose-400",
@@ -73,7 +74,7 @@ function AstronautDetails() {
     },
     {
       label: "Blood Oxygen",
-      value: astronaut.spo2,
+      value: astronaut.spo2_percent,
       unit: "%",
       icon: Wind,
       color: "text-cyan-400",
@@ -82,7 +83,7 @@ function AstronautDetails() {
     },
     {
       label: "Body Temperature",
-      value: astronaut.temperature,
+      value: astronaut.body_temperature_celsius,
       unit: "°C",
       icon: Thermometer,
       color: "text-amber-400",
@@ -91,7 +92,7 @@ function AstronautDetails() {
     },
     {
       label: "Sleep Duration",
-      value: astronaut.sleep,
+      value: astronaut.sleep_hours_last_24h,
       unit: "hrs",
       icon: Moon,
       color: "text-purple-400",
@@ -99,22 +100,22 @@ function AstronautDetails() {
       description: "Sleep monitoring indicator",
     },
     {
-      label: "Radiation Exposure",
-      value: astronaut.radiation,
-      unit: "mSv",
+      label: "Radiation Dose Rate",
+      value: astronaut.radiation_dose_rate_usv_per_hour,
+      unit: "μSv/hour",
       icon: Radiation,
       color: "text-orange-400",
       bg: "bg-orange-400/10",
-      description: "Radiation monitoring indicator",
+      description: "Radiation dose rate; awaiting validated data",
     },
     {
       label: "Fatigue Level",
-      value: astronaut.fatigue,
-      unit: "",
+      value: astronaut.fatigue_level_0_10,
+      unit: "/10",
       icon: ShieldCheck,
       color: "text-emerald-400",
       bg: "bg-emerald-400/10",
-      description: "Fatigue monitoring indicator",
+      description: "Numerical fatigue indicator",
     },
   ];
 
@@ -164,7 +165,7 @@ function AstronautDetails() {
                 <div className="flex flex-wrap items-center gap-2">
                   <Fingerprint size={15} className="text-cyan-400" />
                   <p className="text-xs font-semibold tracking-widest text-cyan-400">
-                    {astronaut.id}
+                    {astronaut.astronaut_id}
                   </p>
                 </div>
 
@@ -198,9 +199,9 @@ function AstronautDetails() {
           {/* Profile information */}
           <div className="mt-7 grid grid-cols-2 gap-5 border-t border-white/10 pt-6 sm:grid-cols-4">
             <Info label="Age" value={`${astronaut.age} years`} />
-            <Info label="Mission" value="ASTRA-01" />
+            <Info label="Mission" value={astronaut.mission} />
             <Info label="Crew Role" value={astronaut.role} />
-            <Info label="Crew Identifier" value={astronaut.id} />
+            <Info label="Crew Identifier" value={astronaut.astronaut_id} />
           </div>
         </div>
       </section>
@@ -226,6 +227,8 @@ function AstronautDetails() {
         <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {metrics.map((metric) => {
             const Icon = metric.icon;
+            const unavailable =
+              metric.value === null || metric.value === undefined;
 
             return (
               <div
@@ -248,13 +251,19 @@ function AstronautDetails() {
                 </p>
 
                 <div className="mt-2 flex items-baseline gap-1.5">
-                  <span className={`text-2xl font-bold ${metric.color}`}>
-                    {metric.value ?? "N/A"}
+                  <span
+                    className={`text-2xl font-bold ${
+                      unavailable ? "text-slate-500" : metric.color
+                    }`}
+                  >
+                    {unavailable ? "Insufficient Data" : metric.value}
                   </span>
 
-                  <span className="text-xs text-slate-500">
-                    {metric.unit}
-                  </span>
+                  {!unavailable && (
+                    <span className="text-xs text-slate-500">
+                      {metric.unit}
+                    </span>
+                  )}
                 </div>
 
                 <p className="mt-2 text-xs text-slate-500">
