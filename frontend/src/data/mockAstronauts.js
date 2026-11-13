@@ -1,66 +1,80 @@
 
 export const mockAstronauts = [
   {
-    id: "AST-001",
+    astronaut_id: "AST-001",
     name: "Alex Morgan",
     role: "Mission Commander",
     mission: "ASTRA-01",
     status: "Normal",
     age: 42,
-    heartRate: 72,
-    spo2: 98,
-    temperature: 36.8,
-    sleep: 7.5,
-    radiation: 0.42,
-    fatigue: "Low",
+
+    // Illustrative telemetry values
+    heart_rate_bpm: 72,
+    spo2_percent: 98,
+    body_temperature_celsius: 36.8,
+    sleep_hours_last_24h: 7.5,
+
+    // Awaiting validated measurements
+    fatigue_level_0_10: null,
+    radiation_dose_rate_usv_per_hour: null,
+
     baseline: "Normal",
   },
   {
-    id: "AST-002",
+    astronaut_id: "AST-002",
     name: "Sarah Chen",
     role: "Flight Engineer",
     mission: "ASTRA-01",
     status: "Monitoring",
     age: 36,
-    heartRate: 88,
-    spo2: 96,
-    temperature: 37.1,
-    sleep: 5.8,
-    radiation: 0.51,
-    fatigue: "Moderate",
+
+    heart_rate_bpm: 88,
+    spo2_percent: 96,
+    body_temperature_celsius: 37.1,
+    sleep_hours_last_24h: 5.8,
+
+    fatigue_level_0_10: null,
+    radiation_dose_rate_usv_per_hour: null,
+
     baseline: "Normal",
   },
   {
-    id: "AST-003",
+    astronaut_id: "AST-003",
     name: "James Wilson",
     role: "Medical Officer",
     mission: "ASTRA-01",
     status: "Normal",
     age: 39,
-    heartRate: 68,
-    spo2: 99,
-    temperature: 36.6,
-    sleep: 8.0,
-    radiation: 0.38,
-    fatigue: "Low",
+
+    heart_rate_bpm: 68,
+    spo2_percent: 99,
+    body_temperature_celsius: 36.6,
+    sleep_hours_last_24h: 8.0,
+
+    fatigue_level_0_10: null,
+    radiation_dose_rate_usv_per_hour: null,
+
     baseline: "Normal",
   },
   {
-    id: "AST-004",
+    astronaut_id: "AST-004",
     name: "Elena Rodriguez",
     role: "Research Specialist",
     mission: "ASTRA-01",
     status: "Normal",
     age: 34,
-    heartRate: 75,
-    spo2: 98,
-    temperature: 36.9,
-    sleep: 7.2,
-    radiation: 0.45,
-    fatigue: "Low",
+
+    heart_rate_bpm: 75,
+    spo2_percent: 98,
+    body_temperature_celsius: 36.9,
+    sleep_hours_last_24h: 7.2,
+
+    fatigue_level_0_10: null,
+    radiation_dose_rate_usv_per_hour: null,
+
     baseline: "Normal",
   },
 ];
 
-// All values are illustrative prototype data.
-// Replace them with backend-provided astronaut records later.
+// Illustrative prototype records, not actual astronaut telemetry.
+// Replace with validated backend-provided records during integration.
